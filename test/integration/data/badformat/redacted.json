@@ -1,6 +1,0 @@
-{
-  "basic example": {
-    "link": "This is some text with [a link][0]",
-    "list and links": "-   Watch the [my-robotic-friends][0].\n-   Read [my-robotic-friends-packet][1].\n-   Print out one [symbol-key][2] per group. This is \"code\" to be used.\n-   [paper-trapezoid-template][3] are provided if your class is not going to use cups.\n-   Print out one set of [stacking-cups-ideas][4] per group.\n-   Make sure each student has a [think-spot-journal][5]."
-  }
-}
