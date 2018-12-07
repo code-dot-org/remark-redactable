@@ -1,13 +1,23 @@
 /**
  * Add support for rending the redacted nodes generated when parsing source data
- * in redact mode. Redacted content shoulud all be of the form:
+ * in redact mode. Redacted can be in one of two forms, inline or block:
+ *
+ * Inline:
  *
  *   [text to translate][i]
  *
- * Where "text to translate" is english text that we should expect the
- * translator to modify, and `i` is the sequential index of this redaction in
- * the content (used to match the redacted content back up with source content
- * for restoration)
+ * Block:
+ *
+ *   [text to translate][i]
+ *
+ *     other markdown
+ *
+ *   [/i]
+ *
+ * Where in both cases "text to translate" is english text that we should
+ * expect the translator to modify, and `i` is the sequential index of this
+ * redaction in the content (used to match the redacted content back up with
+ * source content for restoration)
  *
  * @example
  *
@@ -19,17 +29,16 @@
  *   const source = "Markdown containing [a link](http://example.com) to be redacted"
  *   // returns "Markdown containing [a link][0] to be redacted"
  *   unified().use([
- *     parse,                          // use the standard parser
- *     redactedLink,                   // add the ability to redact links
- *     { settings: { redact: true } }, // put the parser in redaction mode
- *     stringify,                      // output back to markdown
- *     renderRedactions                // use this extension
- *   ]).stringify(source);
+ *     parse,        // use the standard parser
+ *     stringify,    // output back to markdown
+ *     redact,       // use this extension
+ *     redactedLink, // add the ability to redact links
+ *   ]).processSync(source);
  *
  * @see https://github.com/remarkjs/remark/tree/remark-stringify%405.0.0/packages/remark-stringify#extending-the-compiler
- * @see restoreRedactions
+ * @see restore
  */
-module.exports = function renderRedactions() {
+module.exports = function redact() {
   if (this.Compiler) {
     const Compiler = this.Compiler;
     const visitors = Compiler.prototype.visitors;
@@ -61,6 +70,12 @@ module.exports = function renderRedactions() {
         return `[${value}][${index++}]`;
       }
     }
+  }
+
+  if (this.Parser) {
+    this.Parser.prototype.setOptions({
+      redact: true
+    })
   }
 }
 

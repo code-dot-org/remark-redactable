@@ -8,26 +8,27 @@
  *   const parse = require('remark-parse');
  *   const stringify = require('remark-stringify');
  *   const unified = require('unified');
+ *
  *   const redactedLink = require('./redactedLink');
+ *   const redact = require('./redact');
  *
  *   const source = "Markdown containing [a link](http://example.com) to be redacted"
  *   const sourceTree = unified().use([
- *     parse,                          // use the standard parser
- *     redactedLink,                   // add the ability to redact links
- *     { settings: { redact: true } }, // put the parser in redaction mode
+ *     parse,        // use the standard parser
+ *     redact,       // use redaction plugin
+ *     redactedLink, // add the ability to redact links
  *   ]).parse(source);
  *
  *   const redacted = "Markdown containing [a modified link][0] that has been redacted"
  *   // returns "Markdown containing [a modified link](http://example.com) that has been redacted"
  *   unified().use([
- *     parse,                         // use the standard parser
- *     restoreRedactions(sourceTree), // use this extension with the source content above
- *     stringify                      // output back to markdown
- *   ]).stringify(redacted);
+ *     parse,               // use the standard parser
+ *     restore(sourceTree), // use this extension with the source content above
+ *     stringify            // output back to markdown
+ *   ]).processSync(redacted);
  *
  * @see https://github.com/remarkjs/remark/tree/remark-parse%405.0.0/packages/remark-parse#extending-the-parser
- * @see renderRedactions
- * @requires restorationRegistration
+ * @see render
  */
 module.exports = function restoreRedactions(sourceTree) {
   // First, walk the source tree and find all redacted nodes.
@@ -70,6 +71,10 @@ module.exports = function restoreRedactions(sourceTree) {
     }
 
     const Parser = this.Parser;
+
+    if (!Parser.prototype.restorationMethods) {
+      Parser.prototype.restorationMethods = {};
+    }
 
     // Add an inline tokenizer
     //
