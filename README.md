@@ -19,7 +19,6 @@ that redaction with the original content from the source string.
 
 ```javascript
 const remark = require('remark')
-
 const { redact, restore, plugins } = require('remark-redactable');
 
 const sourceText = "A [black](http://black.com) [cat](http://cat.com)\n";
@@ -193,7 +192,6 @@ from the logic that builds a node from that extracted data:
 
 ```diff
 diff --git a/mention.js b/mention.js
-index c87085f..12b67ed 100644
 --- a/mention.js
 +++ b/mention.js
 @@ -23,14 +29,19 @@ function tokenizeMention(eat, value, silent) {
@@ -225,7 +223,7 @@ index c87085f..12b67ed 100644
 
 Then, conditionally create a `redaction` node instead of the desired regular
 node when in redaction mode (see more about the `redaction` node
-[here](https://github.com/code-dot-org/remark-redactable/blob/29c64b3c9e736e28746e6a8627b57c8cc3f0dcc0/src/plugins/process/restorationRegistration.js#L8-L15)):
+[here](https://github.com/code-dot-org/remark-redactable/wiki/Redaction-Nodes)):
 
 Note here that all that is required of the redaction node is that it contains a
 unique `redactionType` identifier, and any information required to recreate the
@@ -233,7 +231,6 @@ node.
 
 ```diff
 diff --git a/mention.js b/mention.js
-index 7a6fc91..08f1bf0 100644
 --- a/mention.js
 +++ b/mention.js
 @@ -1,10 +1,15 @@
@@ -279,7 +276,6 @@ newly-isolated node creation logic.
 
 ```diff
 diff --git a/mention.js b/mention.js
-index 08f1bf0..beb01ca 100644
 --- a/mention.js
 +++ b/mention.js
 @@ -6,6 +6,11 @@ function mentions() {
@@ -300,14 +296,30 @@ index 08f1bf0..beb01ca 100644
 
 We can now redact and restore `@` mentions:
 
-```bash
-$ echo "Hello @example" > source.md
-$ redact source.md -p mention.js | tee redacted.md
-Hello [][0]
-$ sed 's/Hello/Bonjour/' redacted.md | tee translated.md
-Bonjour [][0]
-$ restore -s source.md -r translated.md -p mention.js
-Bonjour [@example](https://social-network/example)
+```javascript
+const remark = require('remark')
+const { redact, restore } = require('remark-redactable');
+const mention = require('mention');
+
+const sourceText = "Hello @example";
+
+const redactedSourceTree = remark()
+  .use(redact)
+  .use(mention)
+  .parse(sourceText);
+
+const redactedText = remark()
+  .use(redact)
+  .stringify(redactedSourceTree); // "Hello [][0]"
+
+const translatedText = redactedText
+  .replace("Hello", "Bonjour"); // "Bonjour [][0]"
+
+const restoredText = remark()
+  .use(restore(redactedSourceTree))
+  .use(plugins.redactedLink)
+  .processSync(translatedText)
+  .contents; // "Bonjour [@example](https://social-network/example)"
 ```
 
 ### Advanced Redaction Example
@@ -330,7 +342,6 @@ To achieve that, we first move the `text` value from a property on the
 
 ```diff
 diff --git a/mention.js b/mention.js
-index beb01ca..af09cc5 100644
 --- a/mention.js
 +++ b/mention.js
 @@ -42,7 +42,11 @@ function tokenizeMention(eat, value, silent) {
@@ -351,7 +362,6 @@ argument, which will contain the modified version of the text content.
 
 ```diff
 diff --git a/mention.js b/mention.js
-index beb01ca..af09cc5 100644
 --- a/mention.js
 +++ b/mention.js
 @@ -8,8 +8,8 @@ function mentions() {
@@ -371,7 +381,7 @@ index beb01ca..af09cc5 100644
 
 The result:
 
-```bash
+```javascript
 $ echo "Hello @example" > source.md
 $ redact source.md -p mention.js | tee redacted.md
 Hello [@example][0]
@@ -379,4 +389,30 @@ $ sed -e 's/Hello/Bonjour/' -e 's/example/exemple/' redacted.md | tee translated
 Bonjour [@exemple][0]
 $ restore -s source.md -r translated.md -p mention.js
 Bonjour [@exemple](https://social-network/example)
+
+const remark = require('remark')
+const { redact, restore } = require('remark-redactable');
+const mention = require('mention');
+
+const sourceText = "Hello @example";
+
+const redactedSourceTree = remark()
+  .use(redact)
+  .use(mention)
+  .parse(sourceText);
+
+const redactedText = remark()
+  .use(redact)
+  .stringify(redactedSourceTree); // "Hello [@example][0]"
+
+const translatedText = redactedText
+  .replace("Hello", "Bonjour")
+  .replace("example", "exemple"); // "Bonjour [@exemple][0]"
+
+const restoredText = remark()
+  .use(restore(redactedSourceTree))
+  .use(plugins.redactedLink)
+  .processSync(translatedText)
+  .contents; // "Bonjour [@exemple](https://social-network/example)"
+
 ```
