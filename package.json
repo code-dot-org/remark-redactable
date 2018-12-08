@@ -1,6 +1,6 @@
 {
   "name": "remark-redactable",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "remark plugin to enable other plugins for redaction and restoration of content",
   "main": "src/index.js",
   "scripts": {
