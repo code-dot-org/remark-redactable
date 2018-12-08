@@ -7,7 +7,8 @@ A plugin that allows sensitive information or complex syntax in markdown
 documents to be removed ("redacted") from the document, then reattached
 ("restored") to the document at some later point.
 
-Used by <code.org> via https://github.com/code-dot-org/redactable-markdown to
+Used by [code.org](https://code.org/) via
+[`redactable-markdown`](https://github.com/code-dot-org/redactable-markdown) to
 enable better internationalization of sensitive, controlled, or complex
 content.
 
@@ -287,8 +288,10 @@ index 08f1bf0..beb01ca 100644
    var methods = Parser.prototype.inlineMethods;
 +  var restorationMethods = Parser.prototype.restorationMethods;
 +
-+  restorationMethods.mention = function (add, node) {
-+    return createMention(add, node.name, node.text);
++  if (restorationMethods) {
++    restorationMethods.mention = function (add, node) {
++      return createMention(add, node.name, node.text);
++    }
 +  }
 
    /* Make the Parser's redact option visible to the tokenizer */
@@ -355,10 +358,12 @@ index beb01ca..af09cc5 100644
    var methods = Parser.prototype.inlineMethods;
    var restorationMethods = Parser.prototype.restorationMethods;
 
--  restorationMethods.mention = function (add, node) {
--    return createMention(add, node.name, node.text);
-+  restorationMethods.mention = function (add, node, content) {
-+    return createMention(add, node.name, content);
+   if (restorationMethods) {
+-    restorationMethods.mention = function (add, node) {
+-      return createMention(add, node.name, node.text);
++    restorationMethods.mention = function (add, node, content) {
++      return createMention(add, node.name, content);
+     }
    }
 
    /* Make the Parser's redact option visible to the tokenizer */
