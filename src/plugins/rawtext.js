@@ -10,8 +10,10 @@ module.exports = function rawtext() {
     const Compiler = this.Compiler;
     const visitors = Compiler.prototype.visitors;
 
-    visitors.rawtext = function (node) {
-      return this.encode(node.value, node);
+    if (visitors) {
+      visitors.rawtext = function (node) {
+        return this.encode(node.value, node);
+      }
     }
   }
 }
