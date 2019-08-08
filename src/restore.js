@@ -1,3 +1,5 @@
+const visit = require("unist-util-visit");
+
 /**
  * Given some valid MDAST representing source content parsed in redact mode,
  * this method extends a parser to enable it to parse redacted versions of that
@@ -32,36 +34,10 @@
  */
 module.exports = function restoreRedactions(sourceTree) {
   // First, walk the source tree and find all redacted nodes.
-  // Block nodes should come in open, close pairs that share an index; entries
-  // in the redactions array should therefore either be an object representing a
-  // single node or an object with three values:
-  // - block = true - indicating that this is a block object
-  // - open - node representing the opening block
-  // - close - node representing the closing block
   const redactions = [];
-  const openBlockIndexes = [];
-  function getRedactedValues(node) {
-    if (node.type === "redaction") {
-      if (node.block) {
-        if (node.closing) {
-          redactions[openBlockIndexes.shift()].close = node;
-        } else {
-          openBlockIndexes.unshift(redactions.length);
-          redactions.push({
-            block: true,
-            open: node
-          });
-        }
-      } else {
-        redactions.push(node);
-      }
-    }
-
-    if (node.children && node.children.length) {
-      node.children.forEach(getRedactedValues);
-    }
-  }
-  getRedactedValues(sourceTree);
+  visit(sourceTree, ["inlineRedaction", "blockRedaction"], function(node) {
+    redactions.push(node);
+  });
 
   // then return an extension to the parser that can consume the data from these
   // redacted nodes when it encounters a redaction
@@ -97,7 +73,7 @@ module.exports = function restoreRedactions(sourceTree) {
       // TODO once we decide on how we want to handle errors, this is where the
       // error handler should probably go
       const redactedData = redactions[index];
-      if (!redactedData) {
+      if (!(redactedData && redactedData.type === "inlineRedaction")) {
         return;
       }
 
@@ -114,13 +90,13 @@ module.exports = function restoreRedactions(sourceTree) {
       return restorationMethod(add, redactedData, content);
     }
 
-    tokenizeInlineRedaction.locator = function (value) {
-      return value.search(INLINE_REDACTION_RE);
+    tokenizeInlineRedaction.locator = function (value, fromIndex) {
+      return value.indexOf('[', fromIndex);
     }
 
-    Parser.prototype.inlineTokenizers.redaction = tokenizeInlineRedaction;
+    Parser.prototype.inlineTokenizers.inlineRedaction = tokenizeInlineRedaction;
     const inlineMethods = Parser.prototype.inlineMethods;
-    inlineMethods.splice(inlineMethods.indexOf('reference'), 0, 'redaction');
+    inlineMethods.splice(inlineMethods.indexOf('reference'), 0, 'inlineRedaction');
 
     // Add a block tokenizer
     //
@@ -161,7 +137,7 @@ module.exports = function restoreRedactions(sourceTree) {
       // TODO once we decide on how we want to handle errors, this is where the
       // error handler should probably go
       const redactedData = redactions[index];
-      if (!(redactedData && redactedData.block)) {
+      if (!(redactedData && redactedData.type === "blockRedaction")) {
         return;
       }
 
@@ -177,7 +153,7 @@ module.exports = function restoreRedactions(sourceTree) {
         return;
       }
 
-      const restorationMethod = Parser.prototype.restorationMethods[redactedData.open.redactionType];
+      const restorationMethod = Parser.prototype.restorationMethods[redactedData.redactionType];
       if (!restorationMethod) {
         return
       }
@@ -197,8 +173,8 @@ module.exports = function restoreRedactions(sourceTree) {
     }
 
     /* Run before default reference. */
-    Parser.prototype.blockTokenizers.redaction = tokenizeBlockRedaction;
+    Parser.prototype.blockTokenizers.blockRedaction = tokenizeBlockRedaction;
     const blockMethods = Parser.prototype.blockMethods;
-    blockMethods.splice(blockMethods.indexOf('paragraph'), 0, 'redaction');
+    blockMethods.splice(blockMethods.indexOf('paragraph'), 0, 'blockRedaction');
   }
 }

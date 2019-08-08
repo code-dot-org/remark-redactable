@@ -223,7 +223,7 @@ diff --git a/mention.js b/mention.js
 
 Then, conditionally create a `redaction` node instead of the desired regular
 node when in redaction mode (see more about the `redaction` node
-[here](https://github.com/code-dot-org/remark-redactable/wiki/Redaction-Nodes)):
+[here](https://github.com/code-dot-org/remark-redactable/blob/master/docs/mdast-nodes.md)):
 
 Note here that all that is required of the redaction node is that it contains a
 unique `redactionType` identifier, and any information required to recreate the
@@ -259,10 +259,12 @@ diff --git a/mention.js b/mention.js
 +
 +    if (redact) {
 +      return add({
-+        type: 'redaction',
++        type: 'inlineRedaction',
 +        redactionType: 'mention',
-+        name: name,
-+        text: text
++        redactionData: {
++          name: name,
++          text: text
++        }
 +      });
 +    }
 +
@@ -286,7 +288,7 @@ diff --git a/mention.js b/mention.js
 +
 +  if (restorationMethods) {
 +    restorationMethods.mention = function (add, node) {
-+      return createMention(add, node.name, node.text);
++      return createMention(add, node.redactionData.name, node.redactionData.text);
 +    }
 +  }
 
@@ -347,9 +349,11 @@ diff --git a/mention.js b/mention.js
 @@ -42,7 +42,11 @@ function tokenizeMention(eat, value, silent) {
          type: 'redaction',
          redactionType: 'mention',
-         name: name,
--        text: text
-+        children: [{
+         redactionData: {
+           name: name,
+-          text: text
+         },
++        redactionContent: [{
 +          type: 'text',
 +          value: text
 +        }]
@@ -370,9 +374,9 @@ diff --git a/mention.js b/mention.js
 
    if (restorationMethods) {
 -    restorationMethods.mention = function (add, node) {
--      return createMention(add, node.name, node.text);
+-      return createMention(add, node.redactionData.name, node.redactionData.text);
 +    restorationMethods.mention = function (add, node, content) {
-+      return createMention(add, node.name, content);
++      return createMention(add, node.redactionData.name, content);
      }
    }
 

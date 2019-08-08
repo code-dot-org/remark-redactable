@@ -40,36 +40,40 @@
  */
 module.exports = function redact() {
   if (this.Compiler) {
-    const Compiler = this.Compiler;
-    const visitors = Compiler.prototype.visitors;
+    const visitors = this.Compiler.prototype.visitors;
+    const stringifyContent = function(node) {
+      return (node.redactionContent || [])
+        .map(content => this.visit(content, node))
+        .join("");
+    };
 
     let index = 0;
-    let openBlockIndexes = [];
 
-    visitors.redaction = function redaction(node) {
-      let value = "";
-
-      var self = this;
-      var exit = self.enterLink();
-      if (node.children) {
-        value = self.all(node).join('');
+    visitors.inlineRedaction = function(node) {
+      let exit;
+      if (node.redactionType === "link" || node.redactionType === "image") {
+        exit = this.enterLink();
       }
-      exit();
 
-      if (node.block) {
-        // redacted blocks should come in open, close pairs that share an index;
-        // when we encounter an open, push the current index onto a stack and
-        // pop it back off when we encounter a close to keep them balanced.
-        if (node.closing) {
-          return `[/${value}][${openBlockIndexes.shift()}]`;
-        } else {
-          openBlockIndexes.unshift(index++);
-          return `[${value}][${openBlockIndexes[0]}]`;
-        }
-      } else {
-        return `[${value}][${index++}]`;
+      const value = stringifyContent.call(this, node);
+
+      if (exit) {
+        exit();
       }
-    }
+
+      return `[${value}][${index++}]`;
+    };
+
+    visitors.blockRedaction = function(node) {
+      const value = stringifyContent.call(this, node);
+
+      const open = `[${value}][${index}]`;
+      const close = `[/][${index++}]`;
+
+      const subvalue = this.block(node);
+
+      return [open, subvalue, close].join("\n\n");
+    };
   }
 
   if (this.Parser) {
