@@ -24,15 +24,15 @@
  *   const parse = require('remark-parse');
  *   const stringify = require('remark-stringify');
  *   const unified = require('unified');
- *   const redactedLink = require('./redactedLink');
+ *   const { link } = require('@code-dot-org/remark-plugins');
  *
  *   const source = "Markdown containing [a link](http://example.com) to be redacted"
  *   // returns "Markdown containing [a link][0] to be redacted"
  *   unified().use([
- *     parse,        // use the standard parser
- *     stringify,    // output back to markdown
- *     redact,       // use this extension
- *     redactedLink, // add the ability to redact links
+ *     parse,     // use the standard parser
+ *     stringify, // output back to markdown
+ *     redact,    // use this extension
+ *     link,      // add the ability to redact links
  *   ]).processSync(source);
  *
  * @see https://github.com/remarkjs/remark/tree/remark-stringify%405.0.0/packages/remark-stringify#extending-the-compiler

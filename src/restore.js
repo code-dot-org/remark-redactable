@@ -11,14 +11,14 @@ const visit = require("unist-util-visit");
  *   const stringify = require('remark-stringify');
  *   const unified = require('unified');
  *
- *   const redactedLink = require('./redactedLink');
+ *   const { link } = require('@code-dot-org/remark-plugins');
  *   const redact = require('./redact');
  *
  *   const source = "Markdown containing [a link](http://example.com) to be redacted"
  *   const sourceTree = unified().use([
- *     parse,        // use the standard parser
- *     redact,       // use redaction plugin
- *     redactedLink, // add the ability to redact links
+ *     parse,  // use the standard parser
+ *     redact, // use redaction plugin
+ *     link,   // add the ability to redact links
  *   ]).parse(source);
  *
  *   const redacted = "Markdown containing [a modified link][0] that has been redacted"
