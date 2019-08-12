@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint --ext .js src/ test/",
     "test": "npm run lint && npm run test:unit",
-    "test:unit": "tape ./test/unit/*.test.js",
+    "test:unit": "tape ./test/*.test.js",
     "preversion": "npm run test",
     "postversion": "git push && git push --tags && npm publish"
   },
