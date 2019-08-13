@@ -1,0 +1,5 @@
+[klass]
+
+# inner content
+
+[/klass]
