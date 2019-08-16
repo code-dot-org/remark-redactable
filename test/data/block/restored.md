@@ -1,0 +1,5 @@
+[klass]
+
+# contenu interne
+
+[/klass]

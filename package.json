@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint --ext .js src/ test/",
     "test": "npm run lint && npm run test:unit",
-    "test:unit": "tape ./test/unit/*.test.js",
+    "test:unit": "tape ./test/*.test.js",
     "preversion": "npm run test",
     "postversion": "git push && git push --tags && npm publish"
   },
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/code-dot-org/remark-redactable#readme",
   "devDependencies": {
-    "@code-dot-org/remark-plugins": "0.2.1",
+    "@code-dot-org/remark-plugins": "0.2.5",
     "eslint": "^5.9.0",
     "remark": "^10.0.1",
     "tape": "^4.9.1"
