@@ -2,8 +2,9 @@ const visit = require("unist-util-visit");
 
 /**
  * Given some valid MDAST representing source content parsed in redact mode,
- * this method extends a parser to enable it to parse redacted versions of that
- * content.
+ * and a MDAST representing redacted content with restoration points found
+ * using findRestorations, this method transforms the tree with *Restoration
+ * nodes to produce a tree that can be rendered.
  *
  * @example
  *
@@ -25,7 +26,8 @@ const visit = require("unist-util-visit");
  *   // returns "Markdown containing [a modified link](http://example.com) that has been redacted"
  *   unified().use([
  *     parse,               // use the standard parser
- *     restore(sourceTree), // use this extension with the source content above
+ *     findRestorations, // find Restoration nodes
+ *     restore(sourceTree, restorationMethods), // use with a tree of the source content and the defined restoration methods
  *     stringify            // output back to markdown
  *   ]).processSync(redacted);
  *

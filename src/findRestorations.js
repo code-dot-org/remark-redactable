@@ -1,3 +1,9 @@
+/**
+ * Tthis method extends a parser to enable it to find potential content that
+ * should be restored.
+ */
+
+
 module.exports = function findRestorations() {
   if (!this.Parser) {
     return;
