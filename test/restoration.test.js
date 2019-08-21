@@ -3,7 +3,7 @@ const path = require("path");
 const remark = require("remark");
 const tape = require("tape");
 
-const {restore, findRestorations} = require("..");
+const {restore, parseRestorations, renderRestorations} = require("..");
 
 fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
   const dataPath = path.resolve(__dirname, "data", testCategory);
@@ -37,7 +37,7 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
       subtest => {
         subtest.plan(1);
         const translatedTree = remark()
-          .use(findRestorations)
+          .use(parseRestorations)
           .parse(translatedText);
         subtest.deepEqual(
           remark()
@@ -54,7 +54,7 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
       subtest => {
         subtest.plan(1);
          const translatedTree = remark()
-          .use(findRestorations)
+          .use(parseRestorations)
           .parse(translatedText);
          const restoredTree =
            remark()
@@ -63,6 +63,7 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
         subtest.equal(
           remark()
             .use(plugin)
+            .use(renderRestorations)
             .stringify(restoredTree),
           restoredText
         );

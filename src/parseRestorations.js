@@ -3,14 +3,17 @@
  * should be restored.
  */
 
+const INLINE_RESTORATION = 'inlineRestoration';
+const BLOCK_RESTORATION = 'blockRestoration';
 
-module.exports = function findRestorations() {
+module.exports = function parseRestorations() {
   if (!this.Parser) {
     return;
   }
   const Parser = this.Parser;
 
-  function tokenizeInlineRestorations(eat, value, silent) {
+  const inlineTokenizers = Parser.prototype.inlineTokenizers;
+  inlineTokenizers[INLINE_RESTORATION] = function(eat, value, silent) {
     const INLINE_REDACTION_RE = /^\[([^\]]*)\]\[(\d+)\]/;
     const match = INLINE_REDACTION_RE.exec(value);
     if (match && !silent) {
@@ -20,26 +23,26 @@ module.exports = function findRestorations() {
       const text = match[1];
       const index = parseInt(match[2]);
       return eat(match[0])({
-        type: "inlineRestoration",
+        type: 'inlineRestoration',
         redactionIndex: index,
         content: text
       });
     }
-  }
-
-  tokenizeInlineRestorations.locator = function(value, fromIndex) {
-    return value.indexOf("[", fromIndex);
   };
 
-  Parser.prototype.inlineTokenizers.findInlineRestorations = tokenizeInlineRestorations;
+  inlineTokenizers[INLINE_RESTORATION].locator = function(value, fromIndex) {
+    return value.indexOf('[', fromIndex);
+  };
+
   const inlineMethods = Parser.prototype.inlineMethods;
   inlineMethods.splice(
-    inlineMethods.indexOf("reference"),
+    inlineMethods.indexOf('reference'),
     0,
-    "findInlineRestorations"
+    INLINE_RESTORATION
   );
 
-  function tokenizeBlockRestorations(eat, value, silent) {
+  const blockTokenizers = Parser.prototype.blockTokenizers;
+  blockTokenizers[BLOCK_RESTORATION] = function(eat, value, silent) {
     const BLOCK_REDACTION_RE = /^\[([^\]]*)\]\[(\d+)\]\n\n/;
     const startMatch = BLOCK_REDACTION_RE.exec(value);
 
@@ -90,13 +93,8 @@ module.exports = function findRestorations() {
       content: content,
       children: children
     });
-  }
+  };
   /* Run before default reference. */
-  Parser.prototype.blockTokenizers.findBlockRestorations = tokenizeBlockRestorations;
   const blockMethods = Parser.prototype.blockMethods;
-  blockMethods.splice(
-    blockMethods.indexOf("paragraph"),
-    0,
-    "findBlockRestorations"
-  );
+  blockMethods.splice(blockMethods.indexOf('paragraph'), 0, BLOCK_RESTORATION);
 };

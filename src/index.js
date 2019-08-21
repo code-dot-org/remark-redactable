@@ -1,9 +1,11 @@
 const redact = require('./redact');
 const restore = require('./restore');
-const findRestorations = require('./findRestorations');
+const parseRestorations = require('./parseRestorations');
+const renderRestorations = require('./renderRestorations');
 
 module.exports = {
   redact,
   restore,
-  findRestorations
+  parseRestorations,
+  renderRestorations
 }
