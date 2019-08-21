@@ -64,7 +64,7 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
     }
   }
 
-  function inlineVisitor(node) {
+  function inlineVisitor(node, index, parent) {
     const redactedData = redactions[node.redactionIndex];
     if (!redactedData || redactedData.type !== "inlineRedaction") {
       Object.assign(node, {
@@ -76,7 +76,7 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
     const restorationMethod = restorationMethods[redactedData.redactionType];
     if (restorationMethod) {
       const restored = restorationMethod(redactedData, node.content);
-      Object.assign(node, restored);
+      parent.children.splice(index, 1, restored);
       return true;
     }
   }

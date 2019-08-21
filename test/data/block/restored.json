@@ -8,25 +8,7 @@
           "type": "rawtext",
           "value": "[klass]"
         }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 5,
-          "column": 7,
-          "offset": 32
-        },
-        "indent": [
-          1,
-          1,
-          1,
-          1
-        ]
-      }
+      ]
     },
     {
       "type": "heading",
@@ -57,16 +39,11 @@
           "offset": 0
         },
         "end": {
-          "line": 5,
-          "column": 7,
-          "offset": 32
+          "line": 1,
+          "column": 18,
+          "offset": 17
         },
-        "indent": [
-          1,
-          1,
-          1,
-          1
-        ]
+        "indent": []
       }
     },
     {
@@ -76,25 +53,7 @@
           "type": "rawtext",
           "value": "[/klass]"
         }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 5,
-          "column": 7,
-          "offset": 32
-        },
-        "indent": [
-          1,
-          1,
-          1,
-          1
-        ]
-      }
+      ]
     }
   ],
   "position": {
