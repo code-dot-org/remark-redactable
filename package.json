@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/code-dot-org/remark-redactable#readme",
   "devDependencies": {
-    "@code-dot-org/remark-plugins": "0.2.5",
+    "@code-dot-org/remark-plugins": "code-dot-org/remark-plugins#refactor-restoration",
     "eslint": "^5.9.0",
     "remark": "^10.0.1",
     "tape": "^4.9.1"
