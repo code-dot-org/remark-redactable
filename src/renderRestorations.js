@@ -3,13 +3,8 @@ module.exports = function renderRestorations() {
     const visitors = this.Compiler.prototype.visitors;
     if (visitors) {
       visitors.inlineRestoration = function(node) {
-        let exit;
         if (node.redactionType === 'link' || node.redactionType === 'image') {
-          exit = this.enterLink();
-        }
-
-        if (exit) {
-          exit();
+          this.enterLink();
         }
 
         return `[${node.content}][${node.redactionIndex}]`;
