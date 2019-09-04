@@ -30,20 +30,7 @@
               "type": "text",
               "value": "chat"
             }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 4,
-              "offset": 3
-            },
-            "end": {
-              "line": 1,
-              "column": 13,
-              "offset": 12
-            },
-            "indent": []
-          }
+          ]
         },
         {
           "type": "text",
@@ -71,20 +58,7 @@
               "type": "text",
               "value": "noir"
             }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 14,
-              "offset": 13
-            },
-            "end": {
-              "line": 1,
-              "column": 23,
-              "offset": 22
-            },
-            "indent": []
-          }
+          ]
         }
       ],
       "position": {

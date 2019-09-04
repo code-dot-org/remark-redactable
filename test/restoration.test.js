@@ -3,12 +3,20 @@ const path = require("path");
 const remark = require("remark");
 const tape = require("tape");
 
-const { restore } = require("..");
+const {restore, parseRestorations, renderRestorations} = require("..");
 
 fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
   const dataPath = path.resolve(__dirname, "data", testCategory);
 
   const plugin = require(path.resolve(dataPath, "plugin.js"));
+  let restorationMethods;
+  if (plugin.length) {
+    restorationMethods = plugin
+      .map(p => p.restorationMethods)
+      .reduce((acc, val) => Object.assign({}, acc, val), {});
+  } else {
+    restorationMethods = plugin.restorationMethods;
+  }
   const redactedTree = require(path.resolve(dataPath, "redacted.json"));
   const restoredText = fs.readFileSync(
     path.join(dataPath, "restored.md"),
@@ -28,11 +36,13 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
       "source tree and redacted content can be restored to an AST",
       subtest => {
         subtest.plan(1);
+        const translatedTree = remark()
+          .use(parseRestorations)
+          .parse(translatedText);
         subtest.deepEqual(
           remark()
-            .use(restore(redactedTree))
-            .use(plugin)
-            .parse(translatedText),
+            .use(restore, redactedTree, restorationMethods)
+            .runSync(translatedTree),
           restoredTree
         );
       }
@@ -43,11 +53,18 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
       "source tree and redacted content can be restored to a string",
       subtest => {
         subtest.plan(1);
+         const translatedTree = remark()
+          .use(parseRestorations)
+          .parse(translatedText);
+         const restoredTree =
+           remark()
+            .use(restore, redactedTree, restorationMethods)
+            .runSync(translatedTree);
         subtest.equal(
           remark()
-            .use(restore(redactedTree))
             .use(plugin)
-            .processSync(translatedText).contents,
+            .use(renderRestorations)
+            .stringify(restoredTree),
           restoredText
         );
       }
