@@ -88,7 +88,7 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
 
   function transform(tree) {
     visit(tree, 'blockRestoration', blockVisitor);
-    visitParents(tree, 'inlineRestoration', inlineVisitor);
+    visit(tree, 'inlineRestoration', inlineVisitor);
   }
   return transform;
 };
