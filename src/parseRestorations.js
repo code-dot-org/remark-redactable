@@ -5,7 +5,7 @@
 
 const INLINE_RESTORATION = 'inlineRestoration';
 const BLOCK_RESTORATION = 'blockRestoration';
-
+/* eslint-disable no-console */
 module.exports = function parseRestorations() {
   if (!this.Parser) {
     return;
@@ -22,12 +22,98 @@ module.exports = function parseRestorations() {
       }
       const text = match[1];
       const index = parseInt(match[2]);
-      return eat(match[0])({
+      const node2 = {
         type: 'inlineRestoration',
         redactionIndex: index,
         content: text
-      });
+      }
+      console.log("original node: " + JSON.stringify(node2));
+      // return eat(match[0])(node);
     }
+    function constructNode(value, isFirstPass = false, self, now) {
+      const leftBracket = '[';
+      const rightBracket = ']';
+      let brackets = { leftBracket:0, rightBracket:0};
+
+      //track the string to be eaten
+      let stringSoFar = "";
+
+      //track the text content and index of redacted content
+      let parsedText = "";
+      let contents = [];
+
+      if (value && value.length > 0 && value[0] === leftBracket) {
+
+        for (let i = 0; i < value.length; i ++) {
+          const char = value[i];
+          if (char === leftBracket) {
+            brackets.leftBracket ++;
+          }
+          else if (char === rightBracket) {
+            brackets.rightBracket ++;
+          }
+
+          if (brackets.leftBracket > brackets.rightBracket) {
+            stringSoFar += char;
+            parsedText += char;
+          }
+
+          else if (brackets.leftBracket === brackets.rightBracket && parsedText !== "") {
+            //add the text value to contents, excluding the brackets
+            contents.push(parsedText.substring(1));
+            parsedText = "";
+            stringSoFar += rightBracket;
+            console.log("contents: " + contents);
+
+            if (contents.length === 2) {
+              let node = {};
+              //base case: no nested brackets, [chat][1]
+              if (brackets.leftBracket === 2 && brackets.rightBracket === 2) {
+                node = {
+                  type: 'inlineRestoration',
+                  redactionIndex: parseInt(contents[1]),
+                  content: contents[0]
+                };
+              }
+              //recurse on the nested brackets
+              else if (brackets.leftBracket > 2 && brackets.rightBracket > 2) {
+                node = {
+                  type: 'inlineRestoration',
+                  redactionIndex: parseInt(contents[1]),
+                  children: self.tokenizeInline(contents[0], now)
+                };
+              }
+              if (isFirstPass) {
+                return [node, stringSoFar];
+              }
+              else {
+                return node;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const constructedNode = constructNode(value, true, this, eat.now());
+    if (constructedNode && constructedNode.length === 2) {
+      console.log("constructedNode" + constructedNode);
+      console.log(JSON.stringify(constructedNode[0]));
+      if (silent) {
+        return true;
+      }
+      //eat([[lien image][2]][3])({
+      //{"type":"inlineRestoration","redactionIndex":3,"children":[{"type":"inlineRestoration","redactionIndex":2,"content":"lien image"}]}
+    //})
+
+    //eat ([chat][1])({
+    //{"type":"inlineRestoration","redactionIndex":1,"content":"chat"}
+  //})
+    //
+    // et un [[lien image][2] and [another image][4]][3]
+      return eat(constructedNode[1])(constructedNode[0]);
+    }
+
   };
 
   inlineTokenizers[INLINE_RESTORATION].locator = function(value, fromIndex) {

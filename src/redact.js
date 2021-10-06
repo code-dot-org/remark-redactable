@@ -42,7 +42,7 @@ module.exports = function redact() {
   if (this.Compiler) {
     const visitors = this.Compiler.prototype.visitors;
     const stringifyContent = function(node) {
-      return (node.redactionContent || [])
+      return (node.redactionContent && node.children ? node.children : node.redactionContent || [])
         .map(content => this.visit(content, node))
         .join("");
     };
@@ -60,7 +60,7 @@ module.exports = function redact() {
       if (exit) {
         exit();
       }
-
+      node.redactionIndex = index;
       return `[${value}][${index++}]`;
     };
 
@@ -68,6 +68,7 @@ module.exports = function redact() {
       const value = stringifyContent.call(this, node);
 
       const open = `[${value}][${index}]`;
+      node.redactionIndex = index;
       const close = `[/][${index++}]`;
 
       const subvalue = this.block(node);

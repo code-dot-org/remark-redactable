@@ -35,10 +35,17 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
     test.test(
       "source tree and redacted content can be restored to an AST",
       subtest => {
+
         subtest.plan(1);
         const translatedTree = remark()
           .use(parseRestorations)
           .parse(translatedText);
+          /* eslint-disable no-console */
+          console.log("translated tree \n" + JSON.stringify(translatedTree));
+          console.log("redacted tree \n" + JSON.stringify(restoredTree));
+          console.log("\n remark result \n" + JSON.stringify(remark()
+          .use(restore, redactedTree, restorationMethods)
+          .runSync(translatedTree)));
         subtest.deepEqual(
           remark()
             .use(restore, redactedTree, restorationMethods)
@@ -56,6 +63,7 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
          const translatedTree = remark()
           .use(parseRestorations)
           .parse(translatedText);
+         console.log(JSON.stringify(translatedTree));
          const restoredTree =
            remark()
             .use(restore, redactedTree, restorationMethods)
