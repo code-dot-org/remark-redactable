@@ -35,7 +35,6 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
     test.test(
       "source tree and redacted content can be restored to an AST",
       subtest => {
-
         subtest.plan(1);
         const translatedTree = remark()
           .use(parseRestorations)
