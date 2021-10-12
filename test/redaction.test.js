@@ -21,13 +21,6 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
 
     // string to ast
     test.test("content can be redacted to Redaction nodes", subtest => {
-      /* eslint-disable no-console */
-      console.log("source text: " + sourceText);
-      console.log("redacted tree \n" + JSON.stringify(redactedTree));
-      console.log("\n remark result \n" + JSON.stringify(remark()
-        .use(redact)
-        .use(plugin)
-        .parse(sourceText)));
       subtest.plan(1);
       subtest.deepEqual(
         remark()

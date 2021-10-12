@@ -67,8 +67,8 @@ module.exports = function redact() {
     visitors.blockRedaction = function(node) {
       const value = stringifyContent.call(this, node);
 
-      const open = `[${value}][${index}]`;
       node.redactionIndex = index;
+      const open = `[${value}][${index}]`;
       const close = `[/][${index++}]`;
 
       const subvalue = this.block(node);

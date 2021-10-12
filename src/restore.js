@@ -1,5 +1,4 @@
 const visit = require('unist-util-visit');
-const visitParents = require('unist-util-visit-parents');
 
 /**
  * Given some valid MDAST representing source content parsed in redact mode,
@@ -35,19 +34,15 @@ const visitParents = require('unist-util-visit-parents');
  * @see https://github.com/remarkjs/remark/tree/remark-parse%405.0.0/packages/remark-parse#extending-the-parser
  * @see render
  */
- /* eslint-disable no-console */
 
 module.exports = function restoreRedactions(sourceTree, restorationMethods) {
   // First, walk the source tree and find all redacted nodes.
   const redactions = {};
   visit(sourceTree, ['inlineRedaction', 'blockRedaction'], function(node) {
-    console.log("VISIT node: " + JSON.stringify(node));
-    console.log("VISIT sourceTree: " + JSON.stringify(sourceTree));
     redactions[node.redactionIndex] = node;
   });
 
   function blockVisitor(node, index, parent) {
-    console.log(redactions);
     const redactedData = redactions[node.redactionIndex];
     if (redactedData && redactedData.type === 'blockRedaction') {
       const restorationMethod = restorationMethods[redactedData.redactionType];
@@ -61,25 +56,20 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
       }
     }
   }
-  // eslint-disable-next-line no-unused-vars
-  let grandparent;
+
   function inlineVisitor(node, index, parent) {
     const redactedData = redactions[node.redactionIndex];
-    console.log("INLINEVISITOR node: " + JSON.stringify(node));
-    console.log("INLINEVISITOR index: " + index);
-    console.log("INLINEVISITOR parent: " + JSON.stringify(parent));
-    console.log("INLINEVISITOR redactions: " + JSON.stringify(redactions));
-
-    console.log("INLINEVISITOR redactedData: " + JSON.stringify(redactedData));
     if (redactedData && redactedData.type === 'inlineRedaction') {
       const restorationMethod = restorationMethods[redactedData.redactionType];
 
       if (restorationMethod) {
         const restored = restorationMethod(redactedData, node.content);
-        console.log("INLINEVISITOR restored: " + JSON.stringify(restored));
-        if (node.redactionIndex === 3) {
-          grandparent = parent;
+
+        //if the node does not have translated content, we assume it has children that do
+        if (!node.content) {
+          restored.children = node.children;
         }
+
         parent.children.splice(index, 1, restored);
         return true;
       }
