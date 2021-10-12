@@ -1,13 +1,12 @@
-
 module.exports = function renderRestorations() {
   if (this.Compiler) {
     const visitors = this.Compiler.prototype.visitors;
     if (visitors) {
-
       visitors.inlineRestoration = function(node) {
         if (node.redactionType === 'link' || node.redactionType === 'image') {
           this.enterLink();
         }
+        
         return `[${node.content}][${node.redactionIndex}]`;
       };
 
