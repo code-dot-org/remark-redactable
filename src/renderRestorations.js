@@ -6,7 +6,7 @@ module.exports = function renderRestorations() {
         if (node.redactionType === 'link' || node.redactionType === 'image') {
           this.enterLink();
         }
-        
+
         return `[${node.content}][${node.redactionIndex}]`;
       };
 
