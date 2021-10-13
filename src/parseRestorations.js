@@ -57,7 +57,7 @@ module.exports = function parseRestorations() {
               return true;
             }
 
-            //base case: no nested brackets, e.g. [chat][1]
+            //case: no nested brackets, e.g. [chat][1]
             if (brackets.leftBracket === 2 && brackets.rightBracket === 2) {
               return eat(stringSoFar)({
                 type: 'inlineRestoration',
@@ -66,7 +66,7 @@ module.exports = function parseRestorations() {
               });
             }
 
-            //recurse on the nested brackets, e.g. [[lien image][2]][3]
+            //case: nested brackets, e.g. [[lien image][2]][3]
             else if (brackets.leftBracket > 2 && brackets.rightBracket > 2) {
               return eat(stringSoFar)({
                 type: 'inlineRestoration',
