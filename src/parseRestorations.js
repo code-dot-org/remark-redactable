@@ -26,7 +26,8 @@ module.exports = function parseRestorations() {
     let contents = [];
 
     if (value && value.length > 0 && value[0] === leftBracket) {
-
+      
+      const digitRegEx = /(\d+)/;
       for (let i = 0; i < value.length; i ++) {
         const char = value[i];
         if (char === leftBracket) {
@@ -46,8 +47,6 @@ module.exports = function parseRestorations() {
           contents.push(parsedText.substring(1));
           parsedText = "";
           stringSoFar += rightBracket;
-
-          const digitRegEx = /(\d+)/;
 
           //construct a restoration node if we have 1 set of brackets with or without nesting,
           //and 1 set of brackets with only digit characters inside
