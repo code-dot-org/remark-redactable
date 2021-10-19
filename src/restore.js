@@ -61,15 +61,8 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
     const redactedData = redactions[node.redactionIndex];
     if (redactedData && redactedData.type === 'inlineRedaction') {
       const restorationMethod = restorationMethods[redactedData.redactionType];
-
       if (restorationMethod) {
-        const restored = restorationMethod(redactedData, node.content);
-
-        //if the node does not have translated content, we assume it has children that do
-        if (!node.content) {
-          restored.children = node.children;
-        }
-
+        const restored = restorationMethod(redactedData, node.content, node.children);
         parent.children.splice(index, 1, restored);
         return true;
       }
