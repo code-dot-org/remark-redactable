@@ -34,11 +34,12 @@ const visit = require('unist-util-visit');
  * @see https://github.com/remarkjs/remark/tree/remark-parse%405.0.0/packages/remark-parse#extending-the-parser
  * @see render
  */
+
 module.exports = function restoreRedactions(sourceTree, restorationMethods) {
   // First, walk the source tree and find all redacted nodes.
-  const redactions = [];
+  const redactions = {};
   visit(sourceTree, ['inlineRedaction', 'blockRedaction'], function(node) {
-    redactions.push(node);
+    redactions[node.redactionIndex] = node;
   });
 
   function blockVisitor(node, index, parent) {
@@ -61,7 +62,7 @@ module.exports = function restoreRedactions(sourceTree, restorationMethods) {
     if (redactedData && redactedData.type === 'inlineRedaction') {
       const restorationMethod = restorationMethods[redactedData.redactionType];
       if (restorationMethod) {
-        const restored = restorationMethod(redactedData, node.content);
+        const restored = restorationMethod(redactedData, node.content, node.children);
         parent.children.splice(index, 1, restored);
         return true;
       }

@@ -59,6 +59,35 @@
               "value": "noir"
             }
           ]
+        },
+        {
+          "type": "text",
+          "value": " et un ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 23,
+              "offset": 22
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "link",
+          "url": "http://example.com/link",
+          "title": null,
+          "children": [
+            {
+              "type": "image",
+              "url": "http://example.com/img.jpg",
+              "alt": "lien image"
+            }
+          ]
         }
       ],
       "position": {
@@ -69,8 +98,8 @@
         },
         "end": {
           "line": 1,
-          "column": 23,
-          "offset": 22
+          "column": 50,
+          "offset": 49
         },
         "indent": []
       }
@@ -85,7 +114,7 @@
     "end": {
       "line": 2,
       "column": 1,
-      "offset": 23
+      "offset": 50
     }
   }
 }
