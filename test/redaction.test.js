@@ -22,11 +22,14 @@ fs.readdirSync(path.resolve(__dirname, "data")).forEach(testCategory => {
     // string to ast
     test.test("content can be redacted to Redaction nodes", subtest => {
       subtest.plan(1);
+      const indexAgnosticTree = remark()
+        .use(redact)
+        .use(plugin)
+        .parse(sourceText);
       subtest.deepEqual(
         remark()
           .use(redact)
-          .use(plugin)
-          .parse(sourceText),
+          .runSync(indexAgnosticTree),
         redactedTree
       );
     });

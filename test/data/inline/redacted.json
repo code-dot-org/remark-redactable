@@ -71,7 +71,8 @@
           },
           "indent": []
         }
-      }]
+      }],
+      "redactionIndex": 0
     }, {
       "type": "text",
       "value": " ",
@@ -141,7 +142,8 @@
           },
           "indent": []
         }
-      }]
+      }],
+      "redactionIndex": 1
     }, {
       "type": "text",
       "value": " and an ",
@@ -183,7 +185,8 @@
         "redactionContent": [{
           "type": "text",
           "value": "image link"
-        }]
+        }],
+        "redactionIndex": 3
       }],
       "position": {
         "start": {
@@ -226,8 +229,10 @@
         "redactionContent": [{
           "type": "text",
           "value": "image link"
-        }]
-      }]
+        }],
+        "redactionIndex": 3
+      }],
+      "redactionIndex": 2
     }],
     "position": {
       "start": {

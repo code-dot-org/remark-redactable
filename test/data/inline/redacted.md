@@ -1,1 +1,1 @@
-A [black][0] [cat][1] and an [[image link][2]][3]
+A [black][0] [cat][1] and an [[image link][3]][2]
