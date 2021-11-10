@@ -1,3 +1,4 @@
+const visit = require('unist-util-visit');
 /**
  * Add support for rending the redacted nodes generated when parsing source data
  * in redact mode. Redacted can be in one of two forms, inline or block:
@@ -42,12 +43,10 @@ module.exports = function redact() {
   if (this.Compiler) {
     const visitors = this.Compiler.prototype.visitors;
     const stringifyContent = function(node) {
-      return (node.redactionContent && node.children ? node.children : node.redactionContent || [])
+      return (node.redactionContent || [])
         .map(content => this.visit(content, node))
         .join("");
     };
-
-    let index = 0;
 
     visitors.inlineRedaction = function(node) {
       let exit;
@@ -60,16 +59,14 @@ module.exports = function redact() {
       if (exit) {
         exit();
       }
-      node.redactionIndex = index;
-      return `[${value}][${index++}]`;
+      return `[${value}][${node.redactionIndex}]`;
     };
 
     visitors.blockRedaction = function(node) {
       const value = stringifyContent.call(this, node);
 
-      node.redactionIndex = index;
-      const open = `[${value}][${index}]`;
-      const close = `[/][${index++}]`;
+      const open = `[${value}][${node.redactionIndex}]`;
+      const close = `[/][${node.redactionIndex}]`;
 
       const subvalue = this.block(node);
 
@@ -77,10 +74,21 @@ module.exports = function redact() {
     };
   }
 
+  let index = 0;
+  function applyRedactionIndex(node) {
+    node.redactionIndex = index++;
+  }
+
+  function transform(tree) {
+    visit(tree, 'blockRedaction', applyRedactionIndex);
+    visit(tree, 'inlineRedaction', applyRedactionIndex);
+  }
+
   if (this.Parser) {
     this.Parser.prototype.setOptions({
       redact: true
-    })
+    });
+    return transform;
   }
 }
 
