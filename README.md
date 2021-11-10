@@ -1,6 +1,6 @@
 # remark-redactable
 
-[![Travis Build Status](https://img.shields.io/travis/code-dot-org/remark-redactable/master.svg)](https://travis-ci.org/code-dot-org/remark-redactable/)
+[![Build Status](https://github.com/code-dot-org/remark-redactable/actions/workflows/continuous-integration-tests.yml/badge.svg?branch=master)](https://github.com/code-dot-org/remark-redactable/actions/workflows/continuous-integration-tests.yml)
 [![npm version](https://img.shields.io/npm/v/remark-redactable.svg)](https://www.npmjs.com/package/remark-redactable)
 
 A plugin that allows sensitive information or complex syntax in markdown
