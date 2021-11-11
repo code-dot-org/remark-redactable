@@ -1,6 +1,6 @@
 # remark-redactable
 
-[![Travis Build Status](https://img.shields.io/travis/code-dot-org/remark-redactable/master.svg)](https://travis-ci.org/code-dot-org/remark-redactable/)
+[![Build Status](https://github.com/code-dot-org/remark-redactable/actions/workflows/continuous-integration-tests.yml/badge.svg?branch=master)](https://github.com/code-dot-org/remark-redactable/actions/workflows/continuous-integration-tests.yml)
 [![npm version](https://img.shields.io/npm/v/remark-redactable.svg)](https://www.npmjs.com/package/remark-redactable)
 
 A plugin that allows sensitive information or complex syntax in markdown
@@ -24,14 +24,18 @@ const { redact, restore, plugins } = require('remark-redactable');
 const sourceText = "A [black](http://black.com) [cat](http://cat.com)\n";
 console.log(`source: ${sourceText}`);
 
-const redactedSourceTree = remark()
+const parsedRedactedSourceTree = remark()
   .use(redact)
   .use(plugins.redactedLink)
   .parse(sourceText);
 
+const transformedRedactedSourceTree = remark()
+  .use(redact)
+  .runSync(parsedRedactedSourceTree);
+
 const redactedText = remark()
   .use(redact)
-  .stringify(redactedSourceTree);
+  .stringify(transformedRedactedSourceTree);
 
 console.log(`redacted: ${redactedText}`);
 const translatedText = "Une [chat][1] [noir][0]\n";
@@ -400,14 +404,18 @@ const mention = require('mention');
 
 const sourceText = "Hello @example";
 
-const redactedSourceTree = remark()
+const parsedRedactedSourceTree = remark()
   .use(redact)
   .use(mention)
   .parse(sourceText);
 
+const transformedRedactedSourceTree = remark()
+  .use(redact)
+  .runSync(parsedRedactedSourceTree);
+
 const redactedText = remark()
   .use(redact)
-  .stringify(redactedSourceTree); // "Hello [@example][0]"
+  .stringify(transformedRedactedSourceTree); // "Hello [@example][0]"
 
 const translatedText = redactedText
   .replace("Hello", "Bonjour")
