@@ -24,14 +24,18 @@ const { redact, restore, plugins } = require('remark-redactable');
 const sourceText = "A [black](http://black.com) [cat](http://cat.com)\n";
 console.log(`source: ${sourceText}`);
 
-const redactedSourceTree = remark()
+const parsedRedactedSourceTree = remark()
   .use(redact)
   .use(plugins.redactedLink)
   .parse(sourceText);
 
+const transformedRedactedSourceTree = remark()
+  .use(redact)
+  .runSync(parsedRedactedSourceTree);
+
 const redactedText = remark()
   .use(redact)
-  .stringify(redactedSourceTree);
+  .stringify(transformedRedactedSourceTree);
 
 console.log(`redacted: ${redactedText}`);
 const translatedText = "Une [chat][1] [noir][0]\n";
@@ -400,14 +404,18 @@ const mention = require('mention');
 
 const sourceText = "Hello @example";
 
-const redactedSourceTree = remark()
+const parsedRedactedSourceTree = remark()
   .use(redact)
   .use(mention)
   .parse(sourceText);
 
+const transformedRedactedSourceTree = remark()
+  .use(redact)
+  .runSync(parsedRedactedSourceTree);
+
 const redactedText = remark()
   .use(redact)
-  .stringify(redactedSourceTree); // "Hello [@example][0]"
+  .stringify(transformedRedactedSourceTree); // "Hello [@example][0]"
 
 const translatedText = redactedText
   .replace("Hello", "Bonjour")
